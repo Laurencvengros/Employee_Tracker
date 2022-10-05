@@ -81,9 +81,33 @@ function viewDepartment(){
         if(err){
             console.log(err)
         }else{
-            console.log(results)
+            console.table(results)
             promptUser();
         };
         
     });
-}
+};
+
+function viewRoles(){
+    let query = "SELECT * FROM roles";
+    db.query(query, function(err,results){
+        if(err){
+            console.log(err)
+        }else{
+            console.table(results)
+            promptUser();
+        };
+    });
+};
+
+function viewEmployees(){
+    let query = "SELECT * FROM employee";
+    db.query(query, function(err,results){
+        if(err){
+            console.log(err)
+        }else{
+            console.table(results)
+            promptUser();
+        };
+    });
+};
