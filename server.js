@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
-const inquirer = require("inquirer");
-const { exit } = require('process');
+const inquirer = require('inquirer');
+const cTable = require('console.table');
+
 
 
 
@@ -68,8 +69,21 @@ function promptUser(){
                 updateRole();
                 break;
             case "Exit application":
-                exit();
+                exitApp();
 
         }
-    })
+    });
+};
+
+function viewDepartment(){
+    let query = "SELECT * FROM department";
+    db.query(query, function(err, results){
+        if(err){
+            console.log(err)
+        }else{
+            console.log(results)
+            promptUser();
+        };
+        
+    });
 }
