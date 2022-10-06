@@ -251,10 +251,59 @@ function deleteEmployee(){
                     if (err){
                         console.log("error deleting employee")
                     }else{
-                        console.log(`employee deleted` )
+                        console.log(`employee deleted` );
+                        viewEmployees();
                     }
                 }   
             )
         })
     })
+};
+
+function updateRole(){
+ db.query(`SELECT * FROM roles;`, (err,response) =>{
+    if(err) throw err;
+    let role = response.map(roles => ({name: roles.title, value: roles.id}));
+    db.query(`SELECT * FROM employee;`, (err, response) =>{
+        if(err) throw err;
+        let employees = response.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id}));
+        inquirer.prompt([
+            {
+                type: "rawlist",
+                name: "chooseEmployee",
+                message: "CHoose an employee to update",
+                choices: employees
+            },
+            {
+                type: "rawlist",
+                name: "chooseNewRole",
+                message: "Select as role",
+                choices: role
+            },
+        ]).then((answer) => {
+                db.query(`UPDATE employee SET ? WHERE ?`,
+                [
+                    {
+                    role_id: answer.chooseNewRole,
+                    },
+                    {
+                        id: answer.chooseEmployee,
+                    },
+                ],
+                (err, response) =>{
+                    if(err){
+                        console.log("error updating role")
+                    }else{
+                        console.log("Role updated!");
+                        viewRoles();
+                    }
+                })   
+            })
+        })
+    })
+};
+
+function exitApp(){
+    db.end();
+    console.log("Goodbye")
 }
