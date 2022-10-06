@@ -26,7 +26,6 @@ db.connect((err) => {
   
 });
 
-
  
 function promptUser(){
     
@@ -45,6 +44,7 @@ function promptUser(){
                 "Update an employee role",
                 "Delete an employee",
                 "Delete a department",
+                "Delete a role",
                 "Exit application"
             ]
         }
@@ -76,6 +76,9 @@ function promptUser(){
                 break;
             case "Delete a department":
                 deleteDepartment();
+                break;
+            case "Delete a role":
+                deleteRole();
                 break;
             case "Exit application":
                 exitApp();
@@ -292,6 +295,36 @@ function deleteDepartment(){
                     }else{
                         console.log("department deleted");
                         viewDepartment();
+                    }
+                }
+            )
+        })
+    })
+};
+
+function deleteRole(){
+    db.query(`SELECT * FROM roles ORDER BY id ASC`, (err, results) =>{
+        if(err) throw err;
+        let role = results.map(roles =>({name:roles.title, value: roles.id}));
+        inquirer.prompt([
+            {
+                type: "rawlist",
+                name: "deleteRole",
+                choices: role
+            },
+        ]).then((answer) => {
+            db.query(`DELETE FROM roles WHERE ?`,
+            [
+                {
+                    id: answer.deleteRole,
+                }
+            ],
+                (err, response) =>{
+                    if(err){
+                        console.log("error deleting role");
+                    }else{
+                    console.log("role deleted");
+                        viewRoles();
                     }
                 }
             )
