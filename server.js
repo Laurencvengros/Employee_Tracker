@@ -133,3 +133,94 @@ function addDepartment(){
     });
 };
 
+function addRole(){
+    db.query(`SELECT * FROM department;`, (err, results) => {
+        if (err) throw err;
+        let departments = results.map(department => ({name: department.name, value: department.id }));
+        inquirer.prompt([
+            {
+            type: 'input',
+            name: 'newRole',
+            message: 'What is the name of the role you want to add?'   
+            },
+            {
+            type: 'input',
+            name: 'salaryAmount',
+            message: 'What is the salary of the role you want to add?'   
+            },
+            {
+            type: 'rawlist',
+            name: 'deptName',
+            message: 'Which department do you want to add the new role to?',
+            choices: departments
+            },
+        ]).then((answer) => {
+            db.query(`INSERT INTO roles SET ?`, 
+            {
+                title: answer.newRole,
+                salary: answer.salaryAmount,
+                department_id: answer.deptName,
+            },
+            (err, response) => {
+                if (err){
+                    console.log("error adding role");
+                }else{
+                console.log(`\n ${answer.title} successfully added to database! \n`);
+                viewRoles();
+                }
+            });
+        });
+    });
+};
+
+function addEmployee(){
+    db.query(`SELECT * FROM roles;`, (err, results) =>{
+        if(err) throw err;
+        let role = results.map(roles => ({name: roles.title, value: roles.id}));
+        db.query(`SELECT * FROM employee;`, (err, results) => {
+            if (err) throw err;
+            let employees = results.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id}));   
+            inquirer.prompt([
+                {
+                    type: "input",
+                    name: "firstName",
+                    message: "Enter the employee's first name"
+                },
+                {
+                    type: "input",
+                    name: "lastName",
+                    message: "Enter the employee's last name"
+                },
+                {
+                    type: "rawlist",
+                    name: "employeeRole",
+                    message: "What is the employee's role?",
+                    choices: role
+                },
+                {
+                    type: 'rawlist',
+                    name: 'employeeManager',
+                    message: 'Who is the new employee\'s manager?',
+                    choices: employees
+                }
+            ]).then((answer) => {
+                db.query(`INSERT INTO employee SET ?`,
+                {
+                    first_name: answer.firstName,
+                    last_name: answer.lastName,
+                    role_id: answer.employeeRole,
+                    manager_id: answer.employeeManager
+                },
+                (err, response) =>{
+                    if(err){
+                        console.log("error adding employee");
+                    }else{
+                        console.log(`\n ${answer.firstName} ${answer.lastName} successfully added to database! \n`);
+                        viewEmployees();
+                    }
+                })
+            })
+        })
+    })
+
+};
