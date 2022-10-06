@@ -43,6 +43,7 @@ function promptUser(){
                 "Add a role",
                 "Add an employee",
                 "Update an employee role",
+                "Delete an employee",
                 "Exit application"
             ]
         }
@@ -68,6 +69,9 @@ function promptUser(){
                 break;
             case "Update an employee role":
                 updateRole();
+                break;
+            case "Delete an employee":
+                deleteEmployee();
                 break;
             case "Exit application":
                 exitApp();
@@ -224,3 +228,33 @@ function addEmployee(){
     })
 
 };
+
+function deleteEmployee(){
+    db.query(`SELECT * FROM employee ORDER BY id ASC;`, (err,results) =>{
+        if(err)throw err;
+        let employees = results.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id}));
+        inquirer.prompt([
+            {
+                type: 'rawlist',
+                name: 'employeeDelete',
+                message: 'Select the employee you want to delete',
+                choices: employees
+            },
+        ]).then((answer) =>{
+            db.query(`DELETE FROM employee WHERE ?`,
+                [
+                    {
+                    id: answer.employeeDelete,
+                }
+                ],
+                (err, response) =>{
+                    if (err){
+                        console.log("error deleting employee")
+                    }else{
+                        console.log(`employee deleted` )
+                    }
+                }   
+            )
+        })
+    })
+}
