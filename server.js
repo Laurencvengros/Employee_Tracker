@@ -44,6 +44,7 @@ function promptUser(){
                 "Add an employee",
                 "Update an employee role",
                 "Delete an employee",
+                "Delete a department",
                 "Exit application"
             ]
         }
@@ -72,6 +73,9 @@ function promptUser(){
                 break;
             case "Delete an employee":
                 deleteEmployee();
+                break;
+            case "Delete a department":
+                deleteDepartment();
                 break;
             case "Exit application":
                 exitApp();
@@ -125,16 +129,19 @@ function addDepartment(){
             message: "What is the name of the department you are adding?",
         }
     ]).then((answer) =>{
-        db.query(`INSERT INTO department (name) VALUES ('${answer.newDeptName}')`, (err,results) => {
-            if (err){
-                console.log("error adding department");
-            }else{
-                console.log(results);
-                viewDepartment();
-                
-            }
+            db.query(`INSERT INTO department SET ?`, 
+            {
+                name: answer.newDeptName,
+            },
+            (err, response) =>{
+                if (err){
+                    console.log("error adding department")
+                }else{
+                    console.log("Department added");
+                    viewDepartment();
+                }
+            })
         });
-    });
 };
 
 function addRole(){
@@ -238,12 +245,10 @@ function deleteEmployee(){
                 type: 'rawlist',
                 name: 'employeeDelete',
                 message: 'Select the employee you want to delete',
-                choices: [employees, "back"]
+                choices: employees
             },
         ]).then((answer) =>{
-            if(answer.employeeDelete === "back"){
-                promptUser();
-            }
+           
             db.query(`DELETE FROM employee WHERE ?`,
                 [
                     {
@@ -258,6 +263,37 @@ function deleteEmployee(){
                         viewEmployees();
                     }
                 }   
+            )
+        })
+    })
+};
+
+function deleteDepartment(){
+    db.query(`SELECT * FROM department ORDER BY id ASC;`, (err, results) =>{
+        if(err) throw err;
+        let departments = results.map(department => ({name: department.name, value: department.id }));
+        inquirer.prompt([
+            {
+                type: "rawlist",
+                name: "deleteDepartment",
+                choices: departments
+            },
+        ]).then((answer) =>{
+            
+            db.query(`DELETE FROM department WHERE ?`,
+                [
+                    {
+                        id: answer.deleteDepartment,
+                    }
+                ],
+                (err, response) =>{
+                    if(err){
+                        console.log("error deleting department")
+                    }else{
+                        console.log("department deleted");
+                        viewDepartment();
+                    }
+                }
             )
         })
     })
