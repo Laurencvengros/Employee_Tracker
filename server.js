@@ -211,12 +211,12 @@ function addEmployee(){
                     role_id: answer.employeeRole,
                     manager_id: answer.employeeManager
                 },
-                (err, response) =>{
+               
+                (err,response) =>{
                     if(err){
-                        console.log("error adding employee");
+                        console.log("error")
                     }else{
                         console.log(`\n ${answer.firstName} ${answer.lastName} successfully added to database! \n`);
-                        viewEmployees();
                     }
                 })
             })
