@@ -1,3 +1,4 @@
+
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
@@ -111,3 +112,24 @@ function viewEmployees(){
         };
     });
 };
+
+function addDepartment(){
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "newDeptName",
+            message: "What is the name of the department you are adding?",
+        }
+    ]).then((answer) =>{
+        db.query(`INSERT INTO department (name) VALUES ('${answer.newDeptName}')`, (err,results) => {
+            if (err){
+                console.log("error adding department");
+            }else{
+                console.log(results);
+                viewDepartment();
+                
+            }
+        });
+    });
+};
+
