@@ -238,9 +238,12 @@ function deleteEmployee(){
                 type: 'rawlist',
                 name: 'employeeDelete',
                 message: 'Select the employee you want to delete',
-                choices: employees
+                choices: [employees, "back"]
             },
         ]).then((answer) =>{
+            if(answer.employeeDelete === "back"){
+                promptUser();
+            }
             db.query(`DELETE FROM employee WHERE ?`,
                 [
                     {
