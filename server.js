@@ -22,6 +22,7 @@ db.connect((err) => {
         console.log("Error connecting");
     }else{
         console.log("Connected! Welcome to the Employee Manager!");
+        console.log("MAIN MENU")
         promptUser();
     }
   
@@ -118,7 +119,15 @@ function viewRoles(){
 };
 
 function viewEmployees(){
-    let query = "SELECT * FROM employee";
+    let query = `
+    SELECT e.id, e.first_name, e.last_name, roles.title, department.name AS department, salary, IFNULL(concat(m.first_name, ' ', m.last_name), 'N/A') AS manager
+    FROM employee e
+    LEFT JOIN employee m
+    ON m.id = e.manager_id
+    JOIN roles
+    ON e.role_id = roles.id
+    JOIN department
+    ON roles.department_id = department.id;`
     db.query(query, function(err,results){
         if(err){
             console.log(err)
