@@ -43,6 +43,7 @@ function promptUser(){
                 "Add a role",
                 "Add an employee",
                 "Update an employee role",
+                "Update an employee manager",
                 "Delete an employee",
                 "Delete a department",
                 "Delete a role",
@@ -71,6 +72,9 @@ function promptUser(){
                 break;
             case "Update an employee role":
                 updateRole();
+                break;
+            case "Update an employee manager":
+                updateManager();
                 break;
             case "Delete an employee":
                 deleteEmployee();
@@ -196,7 +200,7 @@ function addEmployee(){
             if (err) throw err;
             managers = results.map(employee => ({name:employee.first_name + " " + employee.last_name, value: employee.id}));
             managers.push({name:"None"});
-            //let employees = results.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id}));   
+               
             inquirer.prompt([
                 {
                     type: "input",
@@ -350,7 +354,7 @@ function updateRole(){
             {
                 type: "rawlist",
                 name: "chooseEmployee",
-                message: "CHoose an employee to update",
+                message: "Choose an employee to update",
                 choices: employees
             },
             {
@@ -382,7 +386,51 @@ function updateRole(){
     })
 };
 
+function updateManager(){
+    db.query(`SELECT * FROM employee;`, (err, results) => {
+        if (err) throw err;
+        managers = results.map(employee => ({name:employee.first_name + " " + employee.last_name, value: employee.id}));
+        managers.push({name:"None"});
+
+    inquirer.prompt([
+        {
+            type: "rawlist",
+            name: "employee",
+            message: "What employee would you like to edit?",
+            choices: managers
+        },
+        {
+            type: "rawlist",
+            name: "manager",
+            message: "CHoose a new manager",
+            choices: managers
+        }
+    ]).then((answer) =>{
+            if(answer.manager === "None"){
+                answer.manager = null;
+            }
+            db.query(`UPDATE employee SET ? WHERE ?`,
+            [
+                {
+                    manager_id: answer.manager,
+                },
+                {
+                    id: answer.employee,
+                }
+            ],
+            (err, response) =>{
+                if(err){
+                    console.log("error updating manager")
+                }else{
+                    console.log(`\n ${answer.employee} manager updated to ${answer.manager}...\n`)
+                    viewEmployees();
+                }
+            })  
+        })
+    })
+};
+
 function exitApp(){
     db.end();
     console.log("Goodbye")
-}
+};
