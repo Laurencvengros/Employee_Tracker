@@ -61,7 +61,7 @@ SO THAT I can organize and plan my business'
 * Screenshots below show examples of prompts and data
 
 
-[Main Menu](./images/main_menu.jpg "screenshot of main menu screen in the terminal" )
+![Main Menu](./images/main_menu.jpg "screenshot of main menu screen in the terminal" )
 
 
 ![View Employees ](./images/view_ees.jpg  "Screenshot of the data you can store" )
