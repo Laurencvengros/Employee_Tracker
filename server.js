@@ -1,4 +1,5 @@
 
+
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
@@ -191,9 +192,11 @@ function addEmployee(){
     db.query(`SELECT * FROM roles;`, (err, results) =>{
         if(err) throw err;
         let role = results.map(roles => ({name: roles.title, value: roles.id}));
-        db.query(`SELECT * FROM employee;`, (err, results) => {
+        db.query(`SELECT * FROM employee WHERE manager_id IS NULL;`, (err, results) => {
             if (err) throw err;
-            let employees = results.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id}));   
+            managers = results.map(employee => ({name:employee.first_name + " " + employee.last_name, value: employee.id}));
+            managers.push({name:"None"});
+            //let employees = results.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id}));   
             inquirer.prompt([
                 {
                     type: "input",
@@ -212,12 +215,15 @@ function addEmployee(){
                     choices: role
                 },
                 {
-                    type: 'rawlist',
+                    type: 'list',
                     name: 'employeeManager',
                     message: 'Who is the new employee\'s manager?',
-                    choices: employees
+                    choices: managers
                 }
             ]).then((answer) => {
+                if(answer.employeeManager === "None"){
+                    answer.employeeManager = null;
+                }
                 db.query(`INSERT INTO employee SET ?`,
                 {
                     first_name: answer.firstName,
@@ -231,6 +237,7 @@ function addEmployee(){
                         console.log("error")
                     }else{
                         console.log(`\n ${answer.firstName} ${answer.lastName} successfully added to database! \n`);
+                        viewEmployees();
                     }
                 })
             })
